@@ -1,6 +1,7 @@
 #pragma once
 #include <bitset>
 #include <list>
+#include <vector>
 
 namespace MathUtils
 {
@@ -32,22 +33,7 @@ namespace MathUtils
 		template<size_t numberRange, typename NumberType = int>
 		std::list<NumberType>* GeneratePrimeList()
 		{
-			std::bitset<numberRange>* table = new std::bitset<numberRange>();
-			table->set();
-			(*table)[0] = false;
-			(*table)[1] = false;
-
-			//Sieve out all non-primes
-			for (size_t i = 2; i < numberRange; ++i)
-			{
-				if ((*table)[i])
-				{
-					for (size_t j = 2 * i; j < numberRange; j += i)
-					{
-						(*table)[j] = false;
-					}
-				}
-			}
+			std::bitset<numberRange>* table = GeneratePrimeTable<numberRange>();
 
 			std::list<NumberType>* primeList = new std::list<NumberType>;
 
@@ -57,6 +43,29 @@ namespace MathUtils
 				if ((*table)[i])
 				{
 					primeList->push_back(static_cast<NumberType>(i));
+				}
+			}
+
+			delete table;
+
+			return primeList;
+		}
+
+		template<size_t numberRange, typename NumberType = int>
+		std::vector<NumberType>* GeneratePrimeArrayList() {
+			size_t numOfPrimes = 0;
+			std::bitset<numberRange>* table = GeneratePrimeTable<numberRange>();
+
+			std::vector<NumberType>* primeList = new std::vector<NumberType>(numOfPrimes);
+			size_t j = 0;
+
+			//Compile prime list
+			for (size_t i = 0; i < numberRange; ++i)
+			{
+				if ((*table)[i])
+				{
+					(*primeList)[j] = static_cast<NumberType>(i);
+					++j;
 				}
 			}
 
