@@ -54,7 +54,26 @@ namespace MathUtils
 		template<size_t numberRange, typename NumberType = int>
 		std::vector<NumberType>* GeneratePrimeArrayList() {
 			size_t numOfPrimes = 0;
-			std::bitset<numberRange>* table = GeneratePrimeTable<numberRange>();
+
+			//Use modified version of GeneratePrimeTable that counts the number of primes
+			//So we can initialise the vector with the amount of memory required
+			std::bitset<numberRange>* table = new std::bitset<numberRange>();
+			table->set();
+			(*table)[0] = false;
+			(*table)[1] = false;
+
+			//Sieve out all non-primes
+			for (size_t i = 2; i < numberRange; ++i)
+			{
+				if ((*table)[i])
+				{
+					++numOfPrimes; //Count primes
+					for (size_t j = 2 * i; j < numberRange; j += i)
+					{
+						(*table)[j] = false;
+					}
+				}
+			}
 
 			std::vector<NumberType>* primeList = new std::vector<NumberType>(numOfPrimes);
 			size_t j = 0;
