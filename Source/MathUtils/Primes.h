@@ -1,6 +1,7 @@
 #pragma once
 #include <bitset>
 #include <list>
+#include <algorithm>
 #include <vector>
 
 namespace MathUtils
@@ -122,12 +123,18 @@ namespace MathUtils
 
 		//Uses a pre calculated prime list so that it only needs to check prime divisors
 		template<typename NumberType = int>
-		bool CheckIfPrime(NumberType n, std::list<NumberType>* primeList) {
+		bool CheckIfPrime(NumberType n, std::vector<NumberType>* primeList) {
 			auto divItr = primeList->begin();
 
 			//Check if even
 			if (n % 2 == 0)
 				return false;
+
+			//Check if n is within primeList's range
+			if (n <= primeList->back())
+			{
+				return std::binary_search(primeList->begin(), primeList->end(), n);
+			}
 
 			//Check if primeList contains all primes below the sqrt of n
 			if ((divItr != primeList->end()) &&
@@ -136,25 +143,31 @@ namespace MathUtils
 				//Check all prime divisors below square root
 				while ((*divItr) * (*divItr) < n)
 				{
-					if (n % divisor == 0)
+					if (n % (*divItr) == 0)
 						return false;
 					else
 						++divItr;
 				}
+
+				//Square number check
+				if ((*divItr) * (*divItr) == n)
+					return false;
+				else
+					return true;
 			}
 			else
 			{
 				//Check all prime divisors within prime list
 				while (divItr != primeList->end())
 				{
-					if (n % divisor == 0)
+					if (n % (*divItr) == 0)
 						return false;
 					else
 						++divItr;
 				}
 
 				//Start at first odd number after last prime in list
-				NumberType divisor = static_cast<NumberType>(3);
+				NumberType divisor = static_cast<NumberType>(primeList->back());
 
 				//Check all odd divisors below square root
 				while (divisor * divisor < n)
@@ -164,13 +177,13 @@ namespace MathUtils
 					else
 						divisor += 2; //skip even divisors
 				}
-			}
 
-			//Square number check
-			if (divisor * divisor == n)
-				return false;
-			else
-				return true;
+				//Square number check
+				if (divisor * divisor == n)
+					return false;
+				else
+					return true;
+			}
 		}
 	}
 }
